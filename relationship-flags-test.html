@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест: Какой ты флаг в отношениях?</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #2ecc71;
+    --yellow: #f1c40f;
+    --red: #e74c3c;
+    --black: #1a1a2e;
+    --bg: #0f0f1a;
+    --card: #1e1e30;
+    --text: #f0f0f0;
+    --muted: #888;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Animated background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+      radial-gradient(ellipse at 20% 20%, rgba(46,204,113,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, rgba(231,76,60,0.08) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, rgba(241,196,15,0.04) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Header */
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+    animation: fadeDown 0.8s ease;
+  }
+
+  .flags-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  .flag-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    animation: pulse 3s ease-in-out infinite;
+  }
+  .flag-dot:nth-child(1) { background: var(--green); animation-delay: 0s; }
+  .flag-dot:nth-child(2) { background: var(--yellow); animation-delay: 0.3s; }
+  .flag-dot:nth-child(3) { background: var(--red); animation-delay: 0.6s; }
+  .flag-dot:nth-child(4) { background: #555; animation-delay: 0.9s; }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.8; }
+    50% { transform: scale(1.3); opacity: 1; }
+  }
+
+  h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(26px, 5vw, 38px);
+    font-weight: 900;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    background: linear-gradient(135deg, #f0f0f0 0%, #aaa 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 300;
+    line-height: 1.6;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* Progress */
+  .progress-wrap {
+    margin-bottom: 32px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .progress-bar {
+    height: 4px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), var(--yellow), var(--red));
+    border-radius: 2px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Question card */
+  .question-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 36px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .question-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--green), var(--yellow), var(--red), transparent);
+  }
+
+  .question-number {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(17px, 3vw, 21px);
+    line-height: 1.5;
+    margin-bottom: 28px;
+    color: #f0f0f0;
+  }
+
+  /* Options */
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #ccc;
+    text-align: left;
+  }
+
+  .option:hover {
+    background: rgba(255,255,255,0.08);
+    border-color: rgba(255,255,255,0.18);
+    color: #fff;
+    transform: translateX(4px);
+  }
+
+  .option.selected {
+    border-color: currentColor;
+    color: #fff;
+  }
+
+  .option.selected.green { border-color: var(--green); background: rgba(46,204,113,0.12); }
+  .option.selected.yellow { border-color: var(--yellow); background: rgba(241,196,15,0.12); }
+  .option.selected.red { border-color: var(--red); background: rgba(231,76,60,0.12); }
+  .option.selected.black { border-color: #666; background: rgba(100,100,100,0.12); }
+
+  .option-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: all 0.25s;
+  }
+
+  .option.selected.green .option-letter { background: var(--green); color: #000; }
+  .option.selected.yellow .option-letter { background: var(--yellow); color: #000; }
+  .option.selected.red .option-letter { background: var(--red); color: #fff; }
+  .option.selected.black .option-letter { background: #555; color: #fff; }
+
+  /* Next button */
+  .next-btn {
+    margin-top: 24px;
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: 0.5px;
+  }
+
+  .next-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, rgba(255,255,255,0.15), rgba(255,255,255,0.08));
+    transform: translateY(-2px);
+  }
+
+  .next-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  /* Result */
+  .result-card {
+    background: var(--card);
+    border-radius: 20px;
+    padding: 40px;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    text-align: center;
+    animation: slideUp 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .result-flag {
+    font-size: 80px;
+    margin-bottom: 8px;
+    animation: bounceIn 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    display: block;
+  }
+
+  .result-flag-name {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(28px, 6vw, 44px);
+    font-weight: 900;
+    margin-bottom: 6px;
+  }
+
+  .result-flag-name.green { color: var(--green); }
+  .result-flag-name.yellow { color: var(--yellow); }
+  .result-flag-name.red { color: var(--red); }
+  .result-flag-name.black { color: #aaa; }
+
+  .result-tagline {
+    font-size: 13px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  .result-description {
+    font-size: 15px;
+    line-height: 1.75;
+    color: #bbb;
+    text-align: left;
+    margin-bottom: 28px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 12px;
+    padding: 20px;
+    border-left: 3px solid currentColor;
+  }
+
+  .result-description.green { border-color: var(--green); }
+  .result-description.yellow { border-color: var(--yellow); }
+  .result-description.red { border-color: var(--red); }
+  .result-description.black { border-color: #555; }
+
+  /* Scores bars */
+  .scores {
+    margin-bottom: 28px;
+  }
+
+  .scores-title {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+
+  .score-label {
+    font-size: 13px;
+    width: 90px;
+    text-align: right;
+    color: #bbb;
+  }
+
+  .score-bar-wrap {
+    flex: 1;
+    height: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .score-bar-fill.green { background: var(--green); }
+  .score-bar-fill.yellow { background: var(--yellow); }
+  .score-bar-fill.red { background: var(--red); }
+  .score-bar-fill.black { background: #666; }
+
+  .score-pct {
+    font-size: 13px;
+    width: 36px;
+    color: #888;
+  }
+
+  /* Traits */
+  .traits {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 28px;
+    justify-content: center;
+  }
+
+  .trait {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: 1px solid;
+  }
+
+  .trait.green { border-color: var(--green); color: var(--green); background: rgba(46,204,113,0.1); }
+  .trait.yellow { border-color: var(--yellow); color: var(--yellow); background: rgba(241,196,15,0.1); }
+  .trait.red { border-color: var(--red); color: var(--red); background: rgba(231,76,60,0.1); }
+  .trait.black { border-color: #666; color: #aaa; background: rgba(100,100,100,0.1); }
+
+  .restart-btn {
+    padding: 14px 32px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.15);
+    background: transparent;
+    color: #fff;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.5px;
+  }
+
+  .restart-btn:hover {
+    background: rgba(255,255,255,0.08);
+    transform: translateY(-2px);
+  }
+
+  .disclaimer {
+    margin-top: 24px;
+    font-size: 11px;
+    color: #555;
+    line-height: 1.5;
+  }
+
+  /* Animations */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes bounceIn {
+    0% { transform: scale(0.3); opacity: 0; }
+    60% { transform: scale(1.1); }
+    80% { transform: scale(0.95); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="flags-row">
+      <div class="flag-dot"></div>
+      <div class="flag-dot"></div>
+      <div class="flag-dot"></div>
+      <div class="flag-dot"></div>
+    </div>
+    <h1>Какой ты флаг в отношениях?</h1>
+    <p class="subtitle">15 вопросов о твоих привычках, реакциях и поведении с партнёром</p>
+  </div>
+
+  <!-- Quiz section -->
+  <div id="quiz-section">
+    <div class="progress-wrap">
+      <div class="progress-info">
+        <span id="q-counter">Вопрос 1 из 15</span>
+        <span id="q-pct">0%</span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="question-card" id="question-card">
+      <div class="question-number" id="q-number">Вопрос 01</div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <button class="next-btn" id="next-btn" disabled onclick="nextQuestion()">
+        Далее →
+      </button>
+    </div>
+  </div>
+
+  <!-- Result section -->
+  <div id="result-section" class="hidden">
+    <div class="result-card">
+      <span class="result-flag" id="result-emoji"></span>
+      <div class="result-flag-name" id="result-name"></div>
+      <div class="result-tagline" id="result-tagline"></div>
+
+      <div class="scores">
+        <div class="scores-title">Распределение флагов</div>
+        <div class="score-row">
+          <span class="score-label">🟢 Зелёный</span>
+          <div class="score-bar-wrap"><div class="score-bar-fill green" id="bar-green" style="width:0%"></div></div>
+          <span class="score-pct" id="pct-green">0%</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">🟡 Жёлтый</span>
+          <div class="score-bar-wrap"><div class="score-bar-fill yellow" id="bar-yellow" style="width:0%"></div></div>
+          <span class="score-pct" id="pct-yellow">0%</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">🔴 Красный</span>
+          <div class="score-bar-wrap"><div class="score-bar-fill red" id="bar-red" style="width:0%"></div></div>
+          <span class="score-pct" id="pct-red">0%</span>
+        </div>
+        <div class="score-row">
+          <span class="score-label">⚫ Чёрный</span>
+          <div class="score-bar-wrap"><div class="score-bar-fill black" id="bar-black" style="width:0%"></div></div>
+          <span class="score-pct" id="pct-black">0%</span>
+        </div>
+      </div>
+
+      <div class="traits" id="result-traits"></div>
+      <div class="result-description" id="result-desc"></div>
+
+      <button class="restart-btn" onclick="restart()">↺ Пройти заново</button>
+      <p class="disclaimer">Результаты носят ориентировочный характер и не являются психологическим диагнозом. При серьёзных затруднениях обратитесь к специалисту.</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// g=green, y=yellow, r=red, b=black
+const questions = [
+  {
+    text: "Когда партнёр совершает ошибку, твоя первая реакция…",
+    options: [
+      { text: "Поддержать и вместе разобраться", flag: "g" },
+      { text: "Слегка расстроиться, но промолчать", flag: "y" },
+      { text: "Сразу высказать всё что думаешь", flag: "r" },
+      { text: "Дистанцироваться и уйти в себя", flag: "b" }
+    ]
+  },
+  {
+    text: "Как ты относишься к личному пространству партнёра?",
+    options: [
+      { text: "Уважаю — у каждого должно быть своё время", flag: "g" },
+      { text: "Иногда завидую его свободе", flag: "y" },
+      { text: "Хочу знать, где он/она и с кем", flag: "r" },
+      { text: "Меня это вообще не касается", flag: "b" }
+    ]
+  },
+  {
+    text: "Если партнёр общается с человеком, который тебе не нравится…",
+    options: [
+      { text: "Доверяю и не вмешиваюсь", flag: "g" },
+      { text: "Намекаю на своё беспокойство", flag: "y" },
+      { text: "Выясняю отношения или запрещаю общение", flag: "r" },
+      { text: "Просто перестаю реагировать", flag: "b" }
+    ]
+  },
+  {
+    text: "Во время конфликта ты чаще всего…",
+    options: [
+      { text: "Спокойно говоришь о своих чувствах", flag: "g" },
+      { text: "Сдерживаешься, но внутри кипишь", flag: "y" },
+      { text: "Повышаешь голос или говоришь резкие слова", flag: "r" },
+      { text: "Уходишь и молчишь несколько дней", flag: "b" }
+    ]
+  },
+  {
+    text: "Как ты выражаешь любовь?",
+    options: [
+      { text: "Открыто, словами и действиями", flag: "g" },
+      { text: "Больше делами, чем словами", flag: "y" },
+      { text: "Через интенсивное внимание и контроль", flag: "r" },
+      { text: "Редко — мне сложно это выражать", flag: "b" }
+    ]
+  },
+  {
+    text: "Когда тебе плохо, ты…",
+    options: [
+      { text: "Говоришь партнёру и ищешь поддержку", flag: "g" },
+      { text: "Намекаешь, но ждёшь, что сам(а) догадается", flag: "y" },
+      { text: "Обвиняешь партнёра или срываешься на него/ней", flag: "r" },
+      { text: "Закрываешься и справляешься в одиночку", flag: "b" }
+    ]
+  },
+  {
+    text: "Как ты относишься к телефону партнёра?",
+    options: [
+      { text: "Это его/её личное — не трогаю", flag: "g" },
+      { text: "Иногда любопытно, но не проверяю", flag: "y" },
+      { text: "Хочу иметь доступ или проверяю тайно", flag: "r" },
+      { text: "Вообще не интересует", flag: "b" }
+    ]
+  },
+  {
+    text: "Если партнёр говорит, что ему/ей нужно время наедине…",
+    options: [
+      { text: "Понимаю и поддерживаю", flag: "g" },
+      { text: "Немного обижаюсь, но не показываю", flag: "y" },
+      { text: "Воспринимаю как отвержение и конфликтую", flag: "r" },
+      { text: "Мне самому(ой) это нужно — рад(а)", flag: "b" }
+    ]
+  },
+  {
+    text: "Как ты относишься к прошлым отношениям партнёра?",
+    options: [
+      { text: "Прошлое — это прошлое, принимаю", flag: "g" },
+      { text: "Иногда задумываюсь, но стараюсь не зацикливаться", flag: "y" },
+      { text: "Ревную и часто поднимаю эту тему", flag: "r" },
+      { text: "Не хочу об этом знать вообще", flag: "b" }
+    ]
+  },
+  {
+    text: "Твой партнёр добивается успеха — тебе это…",
+    options: [
+      { text: "Искренне радует и вдохновляет", flag: "g" },
+      { text: "Радует, но где-то слегка задевает моё самолюбие", flag: "y" },
+      { text: "Пугает — вдруг он/она уйдёт", flag: "r" },
+      { text: "Безразлично, у меня свой путь", flag: "b" }
+    ]
+  },
+  {
+    text: "Как часто ты говоришь партнёру то, что реально думаешь?",
+    options: [
+      { text: "Почти всегда — я ценю честность", flag: "g" },
+      { text: "Иногда фильтрую, чтобы не обидеть", flag: "y" },
+      { text: "Говорю всё, иногда слишком резко", flag: "r" },
+      { text: "Редко — проще молчать", flag: "b" }
+    ]
+  },
+  {
+    text: "Что происходит после серьёзного конфликта?",
+    options: [
+      { text: "Обсуждаем, мирюсь и двигаемся дальше", flag: "g" },
+      { text: "Миримся, но осадок остаётся", flag: "y" },
+      { text: "Долго не могу отпустить обиду", flag: "r" },
+      { text: "Предпочитаю сделать вид, что ничего не было", flag: "b" }
+    ]
+  },
+  {
+    text: "Насколько часто ты испытываешь ревность?",
+    options: [
+      { text: "Редко — доверие важнее", flag: "g" },
+      { text: "Иногда, особенно в неуверенные моменты", flag: "y" },
+      { text: "Довольно часто, и это влияет на отношения", flag: "r" },
+      { text: "Почти никогда — мне всё равно", flag: "b" }
+    ]
+  },
+  {
+    text: "Как ты реагируешь, если партнёр критикует тебя?",
+    options: [
+      { text: "Слушаю, если это конструктивно", flag: "g" },
+      { text: "Обижаюсь, но стараюсь принять", flag: "y" },
+      { text: "Защищаюсь или атакую в ответ", flag: "r" },
+      { text: "Ухожу в себя и закрываюсь", flag: "b" }
+    ]
+  },
+  {
+    text: "Как ты представляешь идеальные отношения?",
+    options: [
+      { text: "Партнёрство, уважение, рост вместе", flag: "g" },
+      { text: "Стабильность и комфорт, без лишних бурь", flag: "y" },
+      { text: "Страсть, слияние, быть нужным(ой) больше всего", flag: "r" },
+      { text: "Свобода и независимость при наличии кого-то рядом", flag: "b" }
+    ]
+  }
+];
+
+const flagData = {
+  g: {
+    name: "Зелёный флаг 🌿",
+    shortName: "green",
+    emoji: "🟢",
+    tagline: "Здоровые отношения",
+    traits: ["Эмпатия", "Доверие", "Открытость", "Зрелость", "Поддержка"],
+    description: "Ты — зелёный флаг в отношениях. Ты умеешь слышать партнёра, выражаешь чувства открыто и уважаешь его личное пространство. Доверие для тебя — основа, а не роскошь. Ты не закрываешься в трудные моменты и готов(а) работать над отношениями. Это редкое и ценное качество — оставаться собой и давать другому быть собой."
+  },
+  y: {
+    name: "Жёлтый флаг 🌼",
+    shortName: "yellow",
+    emoji: "🟡",
+    tagline: "Осторожность и рост",
+    traits: ["Сдержанность", "Тревожность", "Неуверенность", "Рефлексия", "Потенциал"],
+    description: "Ты — жёлтый флаг. Ты стараешься делать всё правильно, но порой тревога или неуверенность мешают быть полностью открытым(ой). Иногда промалчиваешь там, где стоило бы сказать, или накапливаешь обиды. Это не плохо — это точки роста. Осознанность, которую ты уже проявляешь, может превратить жёлтый флаг в зелёный."
+  },
+  r: {
+    name: "Красный флаг 🔥",
+    shortName: "red",
+    emoji: "🔴",
+    tagline: "Сигнал к изменениям",
+    traits: ["Контроль", "Ревность", "Импульсивность", "Страх потери", "Интенсивность"],
+    description: "Ты — красный флаг. Это честный и важный сигнал. Возможно, за твоим поведением стоят страх, боль или прошлые травмы — но они влияют на отношения. Контроль, вспышки, ревность могут ранить партнёра и разрушать близость. Хорошая новость: осознание — уже первый шаг. Работа с психологом может сильно помочь."
+  },
+  b: {
+    name: "Чёрный флаг 🌑",
+    shortName: "black",
+    emoji: "⚫",
+    tagline: "Дистанция и защита",
+    traits: ["Закрытость", "Автономия", "Избегание", "Холодность", "Независимость"],
+    description: "Ты — чёрный флаг. Эмоциональная закрытость и дистанцирование — твои способы защититься. Ты ценишь независимость, но партнёру может быть трудно чувствовать твою близость. Это может создавать ощущение одиночества в паре. За закрытостью часто стоит глубина — стоит постепенно учиться открываться тем, кому доверяешь."
+  }
+};
+
+let currentQ = 0;
+let scores = { g: 0, y: 0, r: 0, b: 0 };
+let selectedOption = null;
+const letters = ['А', 'Б', 'В', 'Г'];
+
+function renderQuestion() {
+  const q = questions[currentQ];
+  document.getElementById('q-number').textContent = 'Вопрос ' + String(currentQ + 1).padStart(2, '0');
+  document.getElementById('q-text').textContent = q.text;
+  document.getElementById('q-counter').textContent = `Вопрос ${currentQ + 1} из ${questions.length}`;
+  const pct = Math.round((currentQ / questions.length) * 100);
+  document.getElementById('q-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+
+  const optionsEl = document.getElementById('q-options');
+  optionsEl.innerHTML = '';
+  selectedOption = null;
+  document.getElementById('next-btn').disabled = true;
+
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="option-letter">${letters[i]}</span><span>${opt.text}</span>`;
+    btn.onclick = () => selectOption(btn, opt.flag, i);
+    optionsEl.appendChild(btn);
+  });
+}
+
+function selectOption(btn, flag, idx) {
+  document.querySelectorAll('.option').forEach(o => {
+    o.classList.remove('selected', 'green', 'yellow', 'red', 'black');
+  });
+  const colorMap = { g: 'green', y: 'yellow', r: 'red', b: 'black' };
+  btn.classList.add('selected', colorMap[flag]);
+  selectedOption = flag;
+  document.getElementById('next-btn').disabled = false;
+}
+
+function nextQuestion() {
+  if (!selectedOption) return;
+  scores[selectedOption]++;
+  currentQ++;
+
+  if (currentQ >= questions.length) {
+    showResult();
+    return;
+  }
+
+  const card = document.getElementById('question-card');
+  card.style.animation = 'none';
+  card.offsetHeight;
+  card.style.animation = 'slideUp 0.5s cubic-bezier(0.4,0,0.2,1)';
+  renderQuestion();
+}
+
+function showResult() {
+  document.getElementById('quiz-section').classList.add('hidden');
+  const resultEl = document.getElementById('result-section');
+  resultEl.classList.remove('hidden');
+
+  // Find winner
+  const winner = Object.entries(scores).sort((a,b) => b[1] - a[1])[0][0];
+  const data = flagData[winner];
+  const colorMap = { g: 'green', y: 'yellow', r: 'red', b: 'black' };
+  const color = colorMap[winner];
+
+  document.getElementById('result-emoji').textContent = data.emoji;
+  document.getElementById('result-name').textContent = data.name;
+  document.getElementById('result-name').className = 'result-flag-name ' + color;
+  document.getElementById('result-tagline').textContent = data.tagline;
+  document.getElementById('result-desc').textContent = data.description;
+  document.getElementById('result-desc').className = 'result-description ' + color;
+
+  // Traits
+  const traitsEl = document.getElementById('result-traits');
+  traitsEl.innerHTML = '';
+  data.traits.forEach(t => {
+    const span = document.createElement('span');
+    span.className = 'trait ' + color;
+    span.textContent = t;
+    traitsEl.appendChild(span);
+  });
+
+  // Bars
+  const total = questions.length;
+  const barMap = { g: 'green', y: 'yellow', r: 'red', b: 'black' };
+  const idMap = { g: 'green', y: 'yellow', r: 'red', b: 'black' };
+
+  setTimeout(() => {
+    Object.entries(scores).forEach(([flag, score]) => {
+      const pct = Math.round((score / total) * 100);
+      document.getElementById('bar-' + idMap[flag]).style.width = pct + '%';
+      document.getElementById('pct-' + idMap[flag]).textContent = pct + '%';
+    });
+  }, 300);
+}
+
+function restart() {
+  currentQ = 0;
+  scores = { g: 0, y: 0, r: 0, b: 0 };
+  selectedOption = null;
+  document.getElementById('result-section').classList.add('hidden');
+  document.getElementById('quiz-section').classList.remove('hidden');
+  renderQuestion();
+}
+
+// Init
+renderQuestion();
+</script>
+</body>
+</html>
